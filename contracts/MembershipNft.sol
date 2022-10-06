@@ -15,6 +15,7 @@ contract PretzelDAO_Membership is ERC721 {
     struct Whitelist {
         address addr;
         uint256 year;
+        bool hasMinted;
     }
     mapping(address => Whitelist) public whitelist;
     address[] whitelistAddr;
@@ -27,6 +28,7 @@ contract PretzelDAO_Membership is ERC721 {
     }
 
     function claimMembershipNft(address member) public returns (uint256) {
+        require(!isWhitelisted(addr), "Not Whitelisted");
         ERC20(membershipPriceTokenAddress).transferFrom(msg.sender, address(this), membershipPriceInToken);
         _tokenIds.increment();
         uint256 membershipId = _tokenIds.current();
@@ -46,6 +48,7 @@ contract PretzelDAO_Membership is ERC721 {
         require(!isWhitelisted(addr), "Already whitelisted");
         whitelisted[_addr].addr = _addr;
         whitelist[_addr].year = membershipYear;
+        whitelist[_addr].hasMinted = false;
         success = true;
     }
 
