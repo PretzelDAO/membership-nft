@@ -68,7 +68,7 @@ contract PretzelDAO_Membership is ERC721 {
         view
         returns (bool isWhitelisted)
     {
-        return whitelist[addr].addr == addr && whitelist[addr].addr == addr;
+        return whitelist[addr].addr == addr && whitelist[addr].year == membershipYear && !whitelist[addr].hasMinted;
     }
 
     function setMembershipPriceTokenAddress (uint256 _membershipPriceTokenAddress) 
