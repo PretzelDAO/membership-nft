@@ -2,14 +2,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/drafts/Counters.sol";
-import "@openzeppelin/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract PretzelDAO_Membership is ERC721 {
+contract PretzelDAO_Membership is ERC721URIStorage, ERC721Enumerable, Ownable {
 
-    uint128 private membershipPriceInToken;
-    uint128 private membershipYear;
+    uint256 private membershipPriceInToken;
+    uint256 private membershipYear;
     address membershipPriceTokenAddress;
 
     struct Whitelist {
@@ -20,19 +21,20 @@ contract PretzelDAO_Membership is ERC721 {
     mapping(address => Whitelist) public whitelist;
     address[] whitelistAddr;
 
-    constructor(uint128 membershipPriceInToken, uint128 _membershipYear, address _membershipPriceTokenAddress) ERC721("PretzelDAO Membership", "MPRTZL") {
-        membershipPriceInToken = membershipPriceInToken;
-        membershipYear = _membershipPriceTokenAddress;
+    constructor(uint256 _membershipPriceInToken, uint256 _membershipYear, address _membershipPriceTokenAddress) ERC721("PretzelDAO Membership", "MPRTZL") {
+        membershipPriceInToken = _membershipPriceInToken;
+        membershipYear = _membershipYear;
         membershipPriceTokenAddress = _membershipPriceTokenAddress;
     }
 
     function claimMembershipNft(address member) public returns (uint256) {
-        require(!isWhitelisted(addr), "Not Whitelisted");
-        ERC20(membershipPriceTokenAddress).transferFrom(msg.sender, address(this), membershipPriceInToken);
-        _tokenIds.increment();
-        uint256 membershipId = _tokenIds.current();
+        require(!isWhitelisted(member), "Not Whitelisted");
+        IERC20 erc20 = IERC20(membershipPriceTokenAddress);
+        erc20.transferFrom(msg.sender, address(this), membershipPriceInToken);
+        uint256 membershipId = totalSupply();
         _mint(member, membershipId);
-        _setTokenUrI(membershipId, string(abi.encodePacked(membershipYear, '/', membershipId)));
+        _setTokenURI(membershipId, string(abi.encodePacked(membershipYear, '/', membershipId)));
+        return membershipId;
     }
 
     function burnNft(uint256 _tokenId) 
@@ -41,40 +43,37 @@ contract PretzelDAO_Membership is ERC721 {
         returns (uint256) 
     {
         _burn(_tokenId);
+        return _tokenId;
     }
 
     function addAddressToWhitelist(address _addr) 
         public
         onlyOwner
-        returns (bool success)
     {
-        require(!isWhitelisted(addr), "Already whitelisted");
-        whitelisted[_addr].addr = _addr;
+        require(!isWhitelisted(_addr), "Already whitelisted");
+        whitelist[_addr].addr = _addr;
         whitelist[_addr].year = membershipYear;
         whitelist[_addr].hasMinted = false;
-        success = true;
     }
 
     function addAddressesToWhitelist(address[] memory _addrs) 
         public 
         onlyOwner
-        returns (bool success)
     {
-        for (unit256 i = 0; i < _addrs.length; i++) {
+        for (uint256 i = 0; i < _addrs.length; i++) {
             addAddressToWhitelist(_addrs[i]);
         }
-        success = true;
     }
 
     function isWhitelisted(address addr)
         public
         view
-        returns (bool isWhitelisted)
+        returns (bool whitelisted)
     {
         return whitelist[addr].addr == addr && whitelist[addr].year == membershipYear && !whitelist[addr].hasMinted;
     }
 
-    function setMembershipPriceTokenAddress (uint256 _membershipPriceTokenAddress) 
+    function setMembershipPriceTokenAddress (address _membershipPriceTokenAddress) 
         public 
         onlyOwner
     {
@@ -83,8 +82,8 @@ contract PretzelDAO_Membership is ERC721 {
 
     function getMembershipPriceTokenAddress() 
         public 
-        pure 
-        returns (uint256) 
+        view 
+        returns (address) 
     {
         return membershipPriceTokenAddress;
     }
@@ -98,7 +97,7 @@ contract PretzelDAO_Membership is ERC721 {
 
     function getMembershipYear() 
         public 
-        pure 
+        view
         returns (uint256) 
     {
         return membershipYear;
@@ -108,14 +107,47 @@ contract PretzelDAO_Membership is ERC721 {
         public 
         onlyOwner
     {
-        membershipPriceInToken = membershipPriceInToken;
+        membershipPriceInToken = _membershipPriceInToken;
     }
 
     function getMembershipPrice() 
         public 
-        pure 
+        view
         returns (uint256) 
     {
         return membershipPriceInToken;
+    }
+
+    // Needed because of interhitance
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId)
+        internal
+        override(ERC721, ERC721Enumerable)
+    {
+        super._beforeTokenTransfer(from, to, tokenId);
+    }
+
+    // Needed because of interhitance
+    function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
+        super._burn(tokenId);
+    }
+
+    // Needed because of interhitance
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        override(ERC721, ERC721URIStorage)
+        returns (string memory)
+    {
+        return super.tokenURI(tokenId);
+    }
+
+    // Needed because of interhitance
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(ERC721, ERC721Enumerable)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
     }
 }
