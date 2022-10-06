@@ -1,0 +1,15 @@
+{
+  "name": "membership-nft",
+  "version": "1.0.0",
+  "description": "membership nfts for the PretzelDAO",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Christian Ziegler",
+  "license": "ISC",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^2.0.0",
+    "hardhat": "^2.11.2"
+  }
+}
