@@ -20,7 +20,6 @@ contract PretzelDAO_Membership is ERC721 {
     mapping(address => Whitelist) public whitelist;
     address[] whitelistAddr;
 
-
     constructor(uint128 membershipPriceInToken, uint128 _membershipYear, address _membershipPriceTokenAddress) ERC721("PretzelDAO Membership", "MPRTZL") {
         membershipPriceInToken = membershipPriceInToken;
         membershipYear = _membershipPriceTokenAddress;
@@ -36,7 +35,11 @@ contract PretzelDAO_Membership is ERC721 {
         _setTokenUrI(membershipId, string(abi.encodePacked(membershipYear, '/', membershipId)));
     }
 
-    function burnNft(uint256 _tokenId) public onlyOwner returns (uint256) {
+    function burnNft(uint256 _tokenId) 
+        public 
+        onlyOwner 
+        returns (uint256) 
+    {
         _burn(_tokenId);
     }
 
@@ -78,7 +81,11 @@ contract PretzelDAO_Membership is ERC721 {
         membershipPriceTokenAddress = _membershipPriceTokenAddress;
     }
 
-    function getMembershipPriceTokenAddress() public pure returns (uint256) {
+    function getMembershipPriceTokenAddress() 
+        public 
+        pure 
+        returns (uint256) 
+    {
         return membershipPriceTokenAddress;
     }
 
@@ -89,7 +96,11 @@ contract PretzelDAO_Membership is ERC721 {
         membershipYear = _membershipYear;
     }
 
-    function getMembershipYear() public pure returns (uint256) {
+    function getMembershipYear() 
+        public 
+        pure 
+        returns (uint256) 
+    {
         return membershipYear;
     }
 
@@ -100,7 +111,11 @@ contract PretzelDAO_Membership is ERC721 {
         membershipPriceInToken = membershipPriceInToken;
     }
 
-    function getMembershipPrice() public pure returns (uint256) {
+    function getMembershipPrice() 
+        public 
+        pure 
+        returns (uint256) 
+    {
         return membershipPriceInToken;
     }
 }
