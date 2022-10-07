@@ -100,9 +100,9 @@ contract PretzelDAO_Membership is IERC721Metadata, ERC721Enumerable, Ownable {
                 ? string(
                     abi.encodePacked(
                         baseURI,
-                        membershipYear.toString(),
+                        Strings.toString(membershipYear),
                         "/",
-                        tokenId.toString()
+                        Strings.toString(tokenId)
                     )
                 )
                 : "";
