@@ -42,7 +42,6 @@ contract PretzelDAO_Membership is IERC721Metadata, ERC721Enumerable, Ownable {
         _;
     }
 
-    
     // Users need to do the approve function for the payable token contract first before they can call this
     function claimMembershipNft(address member) public returns (uint256) {
         require(isWhitelisted(member), "Not Whitelisted");
