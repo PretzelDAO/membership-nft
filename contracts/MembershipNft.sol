@@ -120,6 +120,28 @@ contract PretzelDAO_Membership is ERC721URIStorage, ERC721Enumerable, Ownable {
         return membershipPriceInToken;
     }
 
+    // make token soulbound
+    function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) 
+        public virtual override(ERC721, IERC721)
+    {
+        return;
+    }
+
+    // make token soulbound
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) 
+        public virtual override(ERC721, IERC721)
+    {
+        return;
+    }
+
     // Needed because of interhitance
     function _beforeTokenTransfer(address from, address to, uint256 tokenId)
         internal

@@ -6,14 +6,17 @@
 // global scope, and execute the script.
 const hre = require("hardhat");
 
+// Görli USDC: 0x07865c6E87B9F70255377e024ace6630C1Eaa37F
+// Görli USDC Faucet: https://usdcfaucet.com/
+
 async function main() {
   const MembershipNFT = await hre.ethers.getContractFactory("PretzelDAO_Membership");
-  const membershipNFT = await MembershipNFT.deploy(1, 2022, "0xdAC17F958D2ee523a2206206994597C13D831ec7", "0xb7a98Adc9254F54205e7ABD4Ad02984b97a10F17");
+  const membershipNFT = await MembershipNFT.deploy(1, 2022, "0x07865c6E87B9F70255377e024ace6630C1Eaa37F", "0xb7a98Adc9254F54205e7ABD4Ad02984b97a10F17");
 
-  await membershipNFT.deployed();
-
+  const contract = await membershipNFT.deployed();
   console.log(
-    'Deployed MembershipNFT Contract',
+    'Deployed MembershipNFT Contract ',
+    contract.address
   );
 }
 
