@@ -21,10 +21,12 @@ contract PretzelDAO_Membership is ERC721URIStorage, ERC721Enumerable, Ownable {
     mapping(address => Whitelist) public whitelist;
     address[] whitelistAddr;
 
-    constructor(uint256 _membershipPriceInToken, uint256 _membershipYear, address _membershipPriceTokenAddress) ERC721("PretzelDAO Membership", "MPRTZL") {
+    constructor(uint256 _membershipPriceInToken, uint256 _membershipYear, address _membershipPriceTokenAddress, address _multisignOwner) ERC721("PretzelDAO Membership", "MPRTZL") {
         membershipPriceInToken = _membershipPriceInToken;
         membershipYear = _membershipYear;
         membershipPriceTokenAddress = _membershipPriceTokenAddress;
+        // Give Control to our MultiSig
+        transferOwnership(_multisignOwner);
     }
 
     function claimMembershipNft(address member) public returns (uint256) {
