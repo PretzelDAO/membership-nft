@@ -7,7 +7,7 @@
 const hre = require("hardhat");
 
 async function main() {
-  const MembershipNFT = await hre.ethers.getContractFactory("MembershipNFT");
+  const MembershipNFT = await hre.ethers.getContractFactory("PretzelDAO_Membership");
   const membershipNFT = await MembershipNFT.deploy(1, 2022, 0xdAC17F958D2ee523a2206206994597C13D831ec7, 0xb7a98Adc9254F54205e7ABD4Ad02984b97a10F17);
 
   await membershipNFT.deployed();
