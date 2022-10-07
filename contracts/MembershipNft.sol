@@ -30,7 +30,7 @@ contract PretzelDAO_Membership is ERC721URIStorage, ERC721Enumerable, Ownable {
     }
 
     function claimMembershipNft(address member) public returns (uint256) {
-        require(!isWhitelisted(member), "Not Whitelisted");
+        require(isWhitelisted(member), "Not Whitelisted");
         IERC20 erc20 = IERC20(membershipPriceTokenAddress);
         erc20.transferFrom(msg.sender, address(this), membershipPriceInToken);
         uint256 membershipId = totalSupply();
@@ -72,7 +72,7 @@ contract PretzelDAO_Membership is ERC721URIStorage, ERC721Enumerable, Ownable {
         view
         returns (bool whitelisted)
     {
-        return whitelist[addr].addr == addr && whitelist[addr].year == membershipYear && !whitelist[addr].hasMinted;
+        return whitelist[addr].addr == addr && whitelist[addr].year == membershipYear && whitelist[addr].hasMinted == false;
     }
 
     function setMembershipPriceTokenAddress (address _membershipPriceTokenAddress) 
