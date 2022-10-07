@@ -12,6 +12,7 @@ contract PretzelDAO_Membership is ERC721URIStorage, ERC721Enumerable, Ownable {
     uint256 private membershipPriceInToken;
     uint256 private membershipYear;
     address membershipPriceTokenAddress;
+    address whitelistDelegate;
 
     struct Whitelist {
         address addr;
@@ -21,12 +22,18 @@ contract PretzelDAO_Membership is ERC721URIStorage, ERC721Enumerable, Ownable {
     mapping(address => Whitelist) public whitelist;
     address[] whitelistAddr;
 
-    constructor(uint256 _membershipPriceInToken, uint256 _membershipYear, address _membershipPriceTokenAddress, address _multisignOwner) ERC721("PretzelDAO Membership", "MPRTZL") {
+    constructor(uint256 _membershipPriceInToken, uint256 _membershipYear, address _membershipPriceTokenAddress, address _multisignOwner, address _whitelistDelegate) ERC721("PretzelDAO Membership", "MPRTZL") {
         membershipPriceInToken = _membershipPriceInToken;
         membershipYear = _membershipYear;
         membershipPriceTokenAddress = _membershipPriceTokenAddress;
+        whitelistDelegate = _whitelistDelegate;
         // Give Control to our MultiSig
         transferOwnership(_multisignOwner);
+    }
+
+    modifier allowedToWhitelist() {
+     require(owner() == _msgSender() || whitelistDelegate == _msgSender());
+     _;   
     }
 
     function claimMembershipNft(address member) public returns (uint256) {
@@ -50,8 +57,9 @@ contract PretzelDAO_Membership is ERC721URIStorage, ERC721Enumerable, Ownable {
 
     function addAddressToWhitelist(address _addr) 
         public
-        onlyOwner
+        allowedToWhitelist
     {
+
         require(!isWhitelisted(_addr), "Already whitelisted");
         whitelist[_addr].addr = _addr;
         whitelist[_addr].year = membershipYear;
@@ -60,7 +68,7 @@ contract PretzelDAO_Membership is ERC721URIStorage, ERC721Enumerable, Ownable {
 
     function addAddressesToWhitelist(address[] memory _addrs) 
         public 
-        onlyOwner
+        allowedToWhitelist
     {
         for (uint256 i = 0; i < _addrs.length; i++) {
             addAddressToWhitelist(_addrs[i]);
@@ -73,6 +81,21 @@ contract PretzelDAO_Membership is ERC721URIStorage, ERC721Enumerable, Ownable {
         returns (bool whitelisted)
     {
         return whitelist[addr].addr == addr && whitelist[addr].year == membershipYear && whitelist[addr].hasMinted == false;
+    }
+
+    function setWhitelistDelegate (address _whitelistDelegate) 
+        public 
+        onlyOwner
+    {
+        whitelistDelegate = _whitelistDelegate;
+    }
+
+    function getWhitelistDelegate() 
+        public 
+        view 
+        returns (address) 
+    {
+        return whitelistDelegate;
     }
 
     function setMembershipPriceTokenAddress (address _membershipPriceTokenAddress) 
