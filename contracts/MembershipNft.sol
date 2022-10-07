@@ -49,6 +49,7 @@ contract PretzelDAO_Membership is IERC721Metadata, ERC721Enumerable, Ownable {
         erc20.transferFrom(msg.sender, address(this), membershipPriceInToken);
         uint256 membershipId = totalSupply();
         _mint(member, membershipId);
+        whitelist[_addr].hasMinted = true;
         return membershipId;
     }
 
