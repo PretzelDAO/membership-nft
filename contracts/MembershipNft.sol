@@ -152,6 +152,7 @@ contract PretzelDAO_Membership is ERC721URIStorage, ERC721Enumerable, Ownable {
     ) 
         public virtual override(ERC721, IERC721)
     {
+        require(false, "Token is Soulbound");
         return;
     }
 
@@ -163,6 +164,7 @@ contract PretzelDAO_Membership is ERC721URIStorage, ERC721Enumerable, Ownable {
     ) 
         public virtual override(ERC721, IERC721)
     {
+        require(false, "Token is Soulbound");
         return;
     }
 
