@@ -45,10 +45,10 @@ contract PretzelDAO_Membership is IERC721Metadata, ERC721Enumerable, Ownable {
     function claimMembershipNft(address member) public returns (uint256) {
         require(isWhitelisted(member), "Not Whitelisted");
         IERC20 erc20 = IERC20(membershipPriceTokenAddress);
-        erc20.transferFrom(msg.sender, address(this), membershipPriceInToken * 10 ** erc20.decimals());
+        erc20.transferFrom(msg.sender, address(owner()), membershipPriceInToken * 10 ** erc20.decimals());
         uint256 membershipId = totalSupply();
         _mint(member, membershipId);
-        whitelist[_addr].hasMinted = true;
+        whitelist[member].hasMinted = true;
         return membershipId;
     }
 
