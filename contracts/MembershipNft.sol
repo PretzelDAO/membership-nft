@@ -45,7 +45,7 @@ contract PretzelDAO_Membership is IERC721Metadata, ERC721Enumerable, Ownable {
     ) ERC721("PretzelDAO Membership", "MPRTZL") {
         membershipPriceInToken = _membershipPriceInToken;
         membershipYear = _membershipYear;
-        membershipPriceTokenAddress[1] = _membershipPriceTokenAddress;
+        membershipPriceTokenAddress[0] = _membershipPriceTokenAddress;
         whitelistDelegate = _whitelistDelegate;
         // Give Control to our MultiSig
         transferOwnership(_multisignOwner);
