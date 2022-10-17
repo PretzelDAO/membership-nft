@@ -2,16 +2,27 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+
+
+interface IERC20 {
+    function decimals() external view returns (uint256);
+    function transferFrom(
+        address from,
+        address to,
+        uint256 amount
+    ) external returns (bool);
+
+}
 
 contract PretzelDAO_Membership is IERC721Metadata, ERC721Enumerable, Ownable {
     uint256 private membershipPriceInToken;
     uint256 private membershipYear;
     string baseURI;
-    address membershipPriceTokenAddress;
+    // address membershipPriceTokenAddress;
     address whitelistDelegate;
 
     struct Whitelist {
@@ -19,6 +30,9 @@ contract PretzelDAO_Membership is IERC721Metadata, ERC721Enumerable, Ownable {
         uint256 year;
         bool hasMinted;
     }
+
+    mapping(uint => address) membershipPriceTokenAddress;
+
     mapping(address => Whitelist) public whitelist;
     address[] whitelistAddr;
 
@@ -31,7 +45,7 @@ contract PretzelDAO_Membership is IERC721Metadata, ERC721Enumerable, Ownable {
     ) ERC721("PretzelDAO Membership", "MPRTZL") {
         membershipPriceInToken = _membershipPriceInToken;
         membershipYear = _membershipYear;
-        membershipPriceTokenAddress = _membershipPriceTokenAddress;
+        membershipPriceTokenAddress[0] = _membershipPriceTokenAddress;
         whitelistDelegate = _whitelistDelegate;
         // Give Control to our MultiSig
         transferOwnership(_multisignOwner);
@@ -42,13 +56,14 @@ contract PretzelDAO_Membership is IERC721Metadata, ERC721Enumerable, Ownable {
         _;
     }
 
-    function claimMembershipNft(address member) public returns (uint256) {
+    function claimMembershipNft(address member, uint pmtCurrencySelector) public returns (uint256) {
         require(isWhitelisted(member), "Not Whitelisted");
-        IERC20 erc20 = IERC20(membershipPriceTokenAddress);
+        address paymentToken = membershipPriceTokenAddress[pmtCurrencySelector];
+        IERC20 erc20 = IERC20(paymentToken);
         erc20.transferFrom(msg.sender, address(owner()), membershipPriceInToken * 10 ** erc20.decimals());
+        whitelist[member].hasMinted = true;
         uint256 membershipId = totalSupply();
         _mint(member, membershipId);
-        whitelist[member].hasMinted = true;
         return membershipId;
     }
 
@@ -56,6 +71,7 @@ contract PretzelDAO_Membership is IERC721Metadata, ERC721Enumerable, Ownable {
         _burn(_tokenId);
         return _tokenId;
     }
+
 
     function addAddressToWhitelist(address _addr) public allowedToWhitelist {
         require(!isWhitelisted(_addr), "Already whitelisted");
@@ -117,13 +133,13 @@ contract PretzelDAO_Membership is IERC721Metadata, ERC721Enumerable, Ownable {
     }
 
     function setMembershipPriceTokenAddress(
-        address _membershipPriceTokenAddress
+        uint currencySelector, address tokenAddress
     ) public onlyOwner {
-        membershipPriceTokenAddress = _membershipPriceTokenAddress;
+        membershipPriceTokenAddress[currencySelector] = tokenAddress;
     }
 
-    function getMembershipPriceTokenAddress() public view returns (address) {
-        return membershipPriceTokenAddress;
+    function getMembershipPriceTokenAddress(uint currencySelector) public view returns (address) {
+        return membershipPriceTokenAddress[currencySelector];
     }
 
     function setMembershipYear(uint256 _membershipYear) public onlyOwner {
